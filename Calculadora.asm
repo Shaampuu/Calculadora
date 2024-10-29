@@ -75,8 +75,17 @@ menu_loop:
     ;Si ninguna opción válida es seleccionada, reinicia el bucle.
 
 sumamos:
-;-------------------------------------------------------------------
-
+    mov ah, 09h
+    lea dx, textoSuma
+    int 21h
+    ; se muestra el mensaje de sumamos.
+    mov ax, num1
+    add ax, num2
+    ; sumamos los dos números.
+    call print_number
+    ; se imprime el resultado.
+    jmp menu_loop
+    ; Regresamos al menú principal.
 resta:
     mov ah, 09h
     lea dx, textoResta
@@ -91,7 +100,18 @@ resta:
     ;Regresa al menú principal.
 
 multiplicacion:
-;----------------------------------------------------------------
+    mov ah, 09h
+    lea dx, textoMultiplicacion
+    int 21h
+    ; se muestra el mensaje de multiplicación.
+    mov ax, num1
+    mov bx, num2
+    imul bx
+    ; se multiplica los dos números.
+    call print_number
+    ; se imprime el resultado.
+    jmp menu_loop
+    ; Regresamos al menú principal.
 division:
     mov ah, 09h
     lea dx, textoDivision
@@ -123,8 +143,18 @@ finalizar:
     int 21h
 
 scan_number:
-;-------------------------------------------------------------------------
-
+    xor ax, ax
+    xor bx, bx
+    xor cx, cx
+    mov ah, 01h
+    int 21h
+    ; Se lee el caracter desde el teclado.
+    cmp al, '-'
+    jne check_positive
+    ; se comprueba si el nmero es negativo.
+    mov bl, 1
+    ;indicamso que el número es negativo.
+    jmp read_digits
 check_positive:
     cmp al, '+'
     jne convert_digit
@@ -168,10 +198,19 @@ finish_input:
 end_scan_number:
     ret
     ;Retorna de la función scan_number.
-
 print_number:
-;_______________________________________________________
-
+    push ax
+    cmp ax, 0
+    jge positive_number
+    ; se comprueba si el número es positivo.
+    push ax
+    mov ah, 02h
+    mov dl, '-'
+    int 21h
+    ; se imprime el signo menos si el número es negativo.
+    pop ax
+    neg ax
+    ; convertimos el número a positivo para imprimir.
 positive_number:
     xor cx, cx
     mov bx, 10
